@@ -98,7 +98,8 @@ class SnapmakerGCodeWriter(MeshWriter):
         gcode_dict = getattr(scene, "gcode_dict")
         gcode_list = gcode_dict.get(active_build_plate, None)
         # Get some vars (I cannot find the correct value)
-            # materialTemp = Application.getInstance().getGlobalContainerStack().extruders[0].material.getMetaData().get("material_print_temperature", "value")
+            # estiTime = ... No idea
+            # printTemp = Application.getInstance().getGlobalContainerStack().extruders[0].material.getMetaData().get("material_print_temperature", "value")
             # bedTemp = Application.getInstance().getGlobalContainerStack().extruders[0].material.getMetaData().get("material_bed_temperature", "value")
         # Generate snapshot
         self.snapshot = self._createSnapshot()
@@ -135,15 +136,15 @@ class SnapmakerGCodeWriter(MeshWriter):
             stream.write("\n\n;header_type: 3dp\n")
             stream.write(";thumbnail: data:image/png;base64,"+base64_message+"\n")
             stream.write(";file_total_lines: "+str(model_line_count)+"\n")
-                # Can we add estimated_time(s) here?
-                # stream.write(";nozzle_temperature(°C): "+str(materialTemp)+"\n")
+                # stream.write(";estimated_time(s): "+str(estiTime)+"\n")
+                # stream.write(";nozzle_temperature(°C): "+str(printTemp)+"\n")
                 # stream.write(";build_plate_temperature(°C): "+str(bedTemp)+"\n")
-            stream.write(header_buffer[7]) # max_x
-            stream.write(header_buffer[8]) # max_y
-            stream.write(header_buffer[9]) # max_z
-            stream.write(header_buffer[4]) # min_x
-            stream.write(header_buffer[5]) # min_y
-            stream.write(header_buffer[6]) # min_z
+            stream.write(header_buffer[7].replace('MAXX:','max_x(mm): ')) # max_x
+            stream.write(header_buffer[8].replace('MAXY:','max_y(mm): ')) # max_y
+            stream.write(header_buffer[9].replace('MAXZ:','max_z(mm): ')) # max_z
+            stream.write(header_buffer[4].replace('MINX:','min_x(mm): ')) # min_x
+            stream.write(header_buffer[5].replace('MINY:','min_y(mm): ')) # min_y
+            stream.write(header_buffer[6].replace('MINZ:','min_z(mm): ')) # min_z
             stream.write("\n;Header End\n\n")
             # Add some useful comments, conform Luban generated code, and/or what I deem usefull
             gcode_buffer = re.sub(r"(M109 S\d+)",r"\1 ;Wait for Hotend Temperature",gcode_buffer)
